@@ -2556,6 +2556,8 @@ tresize(int col, int row) {
 	if(col < 1 || row < 1)
 		return 0;
 
+	tscrollhome();
+	
 	/* free unneeded rows */
 	i = 0;
 	if(slide > 0) {
@@ -2565,6 +2567,7 @@ tresize(int col, int row) {
 		 * memmove because we're freeing the earlier lines
 		 */
 		for(/* i = 0 */; i < slide; i++) {
+			listpush(&term.oldlines, term.line[i], term.linelen[i]);
 			free(term.line[i]);
 			free(term.alt[i]);
 		}
@@ -2624,7 +2627,7 @@ tresize(int col, int row) {
 		if(mincol < col && 0 < minrow) {
 			for(int i = 0; i < minrow; i++) {
 				if(term.linelen[i] < col) {
-					tclearregion(mincol, i, col - 1, i);
+					tclearregion(term.linelen[i], i, col - 1, i);
 					term.linelen[i] = col;
 				}
 			}
