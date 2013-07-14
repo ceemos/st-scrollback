@@ -1445,10 +1445,10 @@ listpop(Lines **list, Line *l, int i, int *len) {
 void
 tscrolldown(int orig, int n, bool storehist) {
 	int i;
-	Line temp;
+	Line temp[n];
+	int tempctr = 0;
 
 	LIMIT(n, 0, term.bot-orig+1);
-
 	
 	for(i = term.bot; i >= term.bot-n+1; i--) {
 		if (storehist)
@@ -1458,15 +1458,17 @@ tscrolldown(int orig, int n, bool storehist) {
 		} else {
 			listpop(&term.oldlines, &term.line[i], i, &term.linelen[i]);
 		}
+		temp[tempctr++] = term.line[i];
 	}
 
 	for(i = term.bot; i >= orig+n; i--) {
-		temp = term.line[i];
 		term.line[i] = term.line[i-n];
-		term.line[i-n] = temp;
-
 		term.dirty[i] = 1;
-		term.dirty[i-n] = 1;
+	}
+	
+	for (i = orig; i < orig+n; i++) {
+		term.line[i] = temp[--tempctr];
+		term.dirty[i] = 1;
 	}
 
 	selscroll(orig, n);
@@ -1475,7 +1477,9 @@ tscrolldown(int orig, int n, bool storehist) {
 void
 tscrollup(int orig, int n) {
 	int i;
-	Line temp;
+	Line temp[n];
+	int tempctr = 0;
+	
 	LIMIT(n, 0, term.bot-orig+1);
 
 	for(i = orig; i < orig+n; i++) {
@@ -1485,16 +1489,17 @@ tscrollup(int orig, int n) {
 		} else {
 			listpop(&term.newlines, &term.line[i], i, &term.linelen[i]);
 		}
+		temp[tempctr++] = term.line[i];
 	}
 
-
 	for(i = orig; i <= term.bot-n; i++) {
-		 temp = term.line[i];
 		 term.line[i] = term.line[i+n];
-		 term.line[i+n] = temp;
-
 		 term.dirty[i] = 1;
-		 term.dirty[i+n] = 1;
+	}
+	
+	for (i = term.bot; i > term.bot-n; i--) {
+		term.line[i] = temp[--tempctr];
+		term.dirty[i] = 1;
 	}
 
 	selscroll(orig, -n);
