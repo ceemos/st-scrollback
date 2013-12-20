@@ -1,7 +1,6 @@
 vt emulation
 ------------
 
-* wide-character support in conjunction with fallback xft code 
 * double-height support
 
 code & interface
@@ -13,7 +12,6 @@ code & interface
 drawing
 -------
 * add diacritics support to xdraws()
-* add kerning configuration
 * make the font cache simpler
 * add hard width handling
 	* xft is reporting wrong width and height for characters
