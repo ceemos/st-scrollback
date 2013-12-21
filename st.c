@@ -1477,6 +1477,7 @@ void
 tscrolldown(int orig, int n, bool storehist) {
 	int i;
 	Line temp[n];
+	int templen[n];
 	int tempctr = 0;
 
 	LIMIT(n, 0, term.bot-orig+1);
@@ -1486,19 +1487,23 @@ tscrolldown(int orig, int n, bool storehist) {
 			listpush(&term.newlines, term.line[i], term.linelen[i]);
 		if(term.oldlines == NULL || IS_SET(MODE_ALTSCREEN)) {
 			tclearregion(0, i, term.col-1, i);
+			term.linelen[i] = term.col;
 		} else {
 			listpop(&term.oldlines, &term.line[i], i, &term.linelen[i]);
 		}
+		templen[tempctr] = term.linelen[i];
 		temp[tempctr++] = term.line[i];
 	}
 
 	for(i = term.bot; i >= orig+n; i--) {
 		term.line[i] = term.line[i-n];
+		term.linelen[i] = term.linelen[i-n];
 		term.dirty[i] = 1;
 	}
 	
 	for (i = orig; i < orig+n; i++) {
 		term.line[i] = temp[--tempctr];
+		term.linelen[i] = templen[tempctr];
 		term.dirty[i] = 1;
 	}
 
@@ -1509,27 +1514,32 @@ void
 tscrollup(int orig, int n) {
 	int i;
 	Line temp[n];
+	int templen[n];
 	int tempctr = 0;
-	
+
 	LIMIT(n, 0, term.bot-orig+1);
 
 	for(i = orig; i < orig+n; i++) {
 		listpush(&term.oldlines, term.line[i], term.linelen[i]);
 		if(term.newlines == NULL || IS_SET(MODE_ALTSCREEN)) {
 			tclearregion(0, i, term.col-1, i);
+			term.linelen[i] = term.col;
 		} else {
 			listpop(&term.newlines, &term.line[i], i, &term.linelen[i]);
 		}
+		templen[tempctr] = term.linelen[i];
 		temp[tempctr++] = term.line[i];
 	}
 
 	for(i = orig; i <= term.bot-n; i++) {
 		 term.line[i] = term.line[i+n];
+		 term.linelen[i] = term.linelen[i+n];
 		 term.dirty[i] = 1;
 	}
 	
 	for (i = term.bot; i > term.bot-n; i--) {
 		term.line[i] = temp[--tempctr];
+		term.linelen[i] = templen[tempctr];
 		term.dirty[i] = 1;
 	}
 
@@ -2678,22 +2688,14 @@ tresize(int col, int row) {
 	tscrollhome();
 	
 	/* free unneeded rows */
-	i = 0;
 	if(slide > 0) {
 		/*
 		 * slide screen to keep cursor where we expect it -
-		 * tscrollup would work here, but we can optimize to
-		 * memmove because we're freeing the earlier lines
 		 */
-		for(/* i = 0 */; i < slide; i++) {
-			listpush(&term.oldlines, term.line[i], term.linelen[i]);
-			free(term.line[i]);
-			free(term.alt[i]);
-		}
-		memmove(term.line, term.line + slide, row * sizeof(Line));
-		memmove(term.alt, term.alt + slide, row * sizeof(Line));
+		tscrollup(0, slide);
+
 	}
-	for(i += row; i < term.row; i++) {
+	for(i = row; i < term.row; i++) {
 		free(term.line[i]);
 		free(term.alt[i]);
 	}
@@ -2721,8 +2723,8 @@ tresize(int col, int row) {
 		term.dirty[i] = 1;
 		term.line[i] = xmalloc(col * sizeof(Glyph));
 		term.alt[i] = xmalloc(col * sizeof(Glyph));
-		term.linelen[i] = col;
-		term.altlen[i]  = col;
+		term.linelen[i] = 0;
+		term.altlen[i] = 0;
 	}
 	if(col > term.col) {
 		bp = term.tabs + term.col;
@@ -2743,17 +2745,11 @@ tresize(int col, int row) {
 	/* Clearing both screens */
 	orig = term.line;
 	do {
-		if(mincol < col && 0 < minrow) {
-			for(int i = 0; i < minrow; i++) {
-				if(term.linelen[i] < col) {
-					tclearregion(term.linelen[i], i, col - 1, i);
-					term.linelen[i] = col;
-				}
+		for(i = 0; i < row; i++) {
+			if(term.linelen[i] < col) {
+				tclearregion(term.linelen[i], i, col - 1, i);
+				term.linelen[i] = col;
 			}
-
-		}
-		if(0 < col && minrow < row) {
-			tclearregion(0, minrow, col - 1, row - 1);
 		}
 		tswapscreen();
 	} while(orig != term.line);
@@ -2762,6 +2758,7 @@ tresize(int col, int row) {
 }
 
 void
+
 xresize(int col, int row) {
 	xw.tw = MAX(1, col * xw.cw);
 	xw.th = MAX(1, row * xw.ch);
