@@ -1450,7 +1450,8 @@ listpush(Lines **list, Line l, int len) {
 	Lines* new;
 	Line newl;
 	new = xmalloc(sizeof(Lines));
-	newl = xmalloc(len * sizeof(Glyph));
+	/* hack: I have no idea why len crashes */
+	newl = xmalloc((len+1) * sizeof(Glyph));
 	memcpy(newl, l, len * sizeof(Glyph));
 	new->len = len;
 	new->line = newl;
