@@ -27,6 +27,7 @@
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xft/Xft.h>
+#include <X11/extensions/XInput2.h>
 #include <fontconfig/fontconfig.h>
 #include <wchar.h>
 
@@ -249,6 +250,7 @@ typedef struct {
 	Display *dpy;
 	Colourmap cmap;
 	Window win;
+    int xi_opcode;
 	Drawable buf;
 	Atom xembed, wmdeletewin, netwmname, netwmpid;
 	XIM xim;
@@ -3041,7 +3043,7 @@ xinit(void) {
 		die("Can't open display\n");
 	xw.scr = XDefaultScreen(xw.dpy);
 	xw.vis = XDefaultVisual(xw.dpy, xw.scr);
-
+   
 	/* font */
 	if(!FcInit())
 		die("Could not init fontconfig.\n");
@@ -3118,7 +3120,29 @@ xinit(void) {
 	if(xw.xic == NULL)
 		die("XCreateIC failed. Could not obtain input method.\n");
 
-	/* white cursor, black outline */
+	/* XInput */
+    
+    /* XInput Extension available? */
+    int event, error;
+    if (!XQueryExtension(xw.dpy, "XInputExtension", &xw.xi_opcode, &event, &error)) {
+        die("X Input extension not available.\n");
+    }
+    /* Which version of XI2? We support 2.2 */
+    int major = 2, minor = 2;
+    if (XIQueryVersion(xw.dpy, &major, &minor) == BadRequest) {
+        die("XI2 not available. Server supports %d.%d\n", major, minor);
+    }
+    XIEventMask eventmask;
+    unsigned char mask[1] = { 0 }; /* the actual mask */
+    eventmask.deviceid = XIAllMasterDevices;
+    eventmask.mask_len = sizeof(mask); /* always in bytes */
+    eventmask.mask = mask;
+    /* now set the mask */
+    XISetMask(mask, XI_DeviceChanged);
+    /* select on the window */
+    XISelectEvents(xw.dpy, xw.win, &eventmask, 1);
+    
+    /* white cursor, black outline */
 	cursor = XCreateFontCursor(xw.dpy, XC_xterm);
 	XDefineCursor(xw.dpy, xw.win, cursor);
 	XRecolorCursor(xw.dpy, cursor,
@@ -3826,6 +3850,26 @@ run(void) {
 				XNextEvent(xw.dpy, &ev);
 				if(XFilterEvent(&ev, None))
 					continue;
+                if (ev.xcookie.type == GenericEvent &&
+                    ev.xcookie.extension == xw.xi_opcode &&
+                    XGetEventData(xw.dpy, &ev.xcookie)) {
+                    XIDeviceChangedEvent *dcev = (XIDeviceChangedEvent*) ev.xcookie.data;
+                    bool touch = False;
+                    printf("Source %d\n", dcev->sourceid);
+                    for (int i = 0; i < dcev->num_classes; i++) {
+                        printf("Class %d\n", dcev->classes[i]->type);
+                        if (dcev->classes[i]->type == XITouchClass) {
+                            printf("Its touch!\n");
+                            touch = True;
+                            break;
+                        }
+                    }
+                    if (!touch) {
+                        printf("Its not touch...\n");
+                    }
+                    continue;
+                }
+                XFreeEventData(xw.dpy, &ev.xcookie);
 				if(handler[ev.type])
 					(handler[ev.type])(&ev);
 			}
