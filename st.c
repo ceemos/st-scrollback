@@ -56,14 +56,14 @@ char *argv0;
 #define XEMBED_FOCUS_OUT 5
 
 /* Arbitrary sizes */
-#define UTF_SIZ       4
+#define UTF_SIZ	4
 #define ESC_BUF_SIZ   (128*UTF_SIZ)
 #define ESC_ARG_SIZ   16
 #define STR_BUF_SIZ   ESC_BUF_SIZ
 #define STR_ARG_SIZ   ESC_ARG_SIZ
 #define DRAW_BUF_SIZ  20*1024
-#define XK_ANY_MOD    UINT_MAX
-#define XK_NO_MOD     0
+#define XK_ANY_MOD  UINT_MAX
+#define XK_NO_MOD	0
 #define XK_SWITCH_MOD (1<<13)
 
 #define REDRAW_TIMEOUT (80*1000) /* 80 ms */
@@ -72,35 +72,35 @@ char *argv0;
 #define SERRNO strerror(errno)
 #define MIN(a, b)  ((a) < (b) ? (a) : (b))
 #define MAX(a, b)  ((a) < (b) ? (b) : (a))
-#define LEN(a)     (sizeof(a) / sizeof(a[0]))
-#define DEFAULT(a, b)     (a) = (a) ? (a) : (b)
+#define LEN(a)   (sizeof(a) / sizeof(a[0]))
+#define DEFAULT(a, b)	(a) = (a) ? (a) : (b)
 #define BETWEEN(x, a, b)  ((a) <= (x) && (x) <= (b))
-#define LIMIT(x, a, b)    (x) = (x) < (a) ? (a) : (x) > (b) ? (b) : (x)
+#define LIMIT(x, a, b)  (x) = (x) < (a) ? (a) : (x) > (b) ? (b) : (x)
 #define ATTRCMP(a, b) ((a).mode != (b).mode || (a).fg != (b).fg || (a).bg != (b).bg)
 #define IS_SET(flag) ((term.mode & (flag)) != 0)
 #define TIMEDIFF(t1, t2) ((t1.tv_sec-t2.tv_sec)*1000 + (t1.tv_usec-t2.tv_usec)/1000)
 #define CEIL(x) (((x) != (int) (x)) ? (x) + 1 : (x))
 
 #define TRUECOLOR(r,g,b) (1 << 24 | (r) << 16 | (g) << 8 | (b))
-#define IS_TRUECOL(x)    (1 << 24 & (x))
-#define TRUERED(x)       (((x) & 0xff0000) >> 8)
-#define TRUEGREEN(x)     (((x) & 0xff00))
-#define TRUEBLUE(x)      (((x) & 0xff) << 8)
+#define IS_TRUECOL(x)   (1 << 24 & (x))
+#define TRUERED(x)	 (((x) & 0xff0000) >> 8)
+#define TRUEGREEN(x)	 (((x) & 0xff00))
+#define TRUEBLUE(x)   (((x) & 0xff) << 8)
 
 
 #define VT102ID "\033[?6c"
 
 enum glyph_attribute {
-	ATTR_NULL      = 0,
+	ATTR_NULL	 = 0,
 	ATTR_REVERSE   = 1,
 	ATTR_UNDERLINE = 2,
-	ATTR_BOLD      = 4,
-	ATTR_GFX       = 8,
-	ATTR_ITALIC    = 16,
-	ATTR_BLINK     = 32,
-	ATTR_WRAP      = 64,
-	ATTR_WIDE      = 128,
-	ATTR_WDUMMY    = 256,
+	ATTR_BOLD	 = 4,
+	ATTR_GFX	   = 8,
+	ATTR_ITALIC = 16,
+	ATTR_BLINK   = 32,
+	ATTR_WRAP	 = 64,
+	ATTR_WIDE	 = 128,
+	ATTR_WDUMMY = 256,
 };
 
 enum cursor_movement {
@@ -115,28 +115,28 @@ enum cursor_state {
 };
 
 enum term_mode {
-	MODE_WRAP        = 1,
-	MODE_INSERT      = 2,
+	MODE_WRAP	   = 1,
+	MODE_INSERT   = 2,
 	MODE_APPKEYPAD   = 4,
 	MODE_ALTSCREEN   = 8,
-	MODE_CRLF        = 16,
-	MODE_MOUSEBTN    = 32,
+	MODE_CRLF	   = 16,
+	MODE_MOUSEBTN   = 32,
 	MODE_MOUSEMOTION = 64,
-	MODE_REVERSE     = 128,
-	MODE_KBDLOCK     = 256,
-	MODE_HIDE        = 512,
-	MODE_ECHO        = 1024,
+	MODE_REVERSE	 = 128,
+	MODE_KBDLOCK	 = 256,
+	MODE_HIDE	   = 512,
+	MODE_ECHO	   = 1024,
 	MODE_APPCURSOR   = 2048,
-	MODE_MOUSESGR    = 4096,
-	MODE_8BIT        = 8192,
-	MODE_BLINK       = 16384,
-	MODE_FBLINK      = 32768,
-	MODE_FOCUS       = 65536,
-	MODE_MOUSEX10    = 131072,
+	MODE_MOUSESGR   = 4096,
+	MODE_8BIT	   = 8192,
+	MODE_BLINK	 = 16384,
+	MODE_FBLINK   = 32768,
+	MODE_FOCUS	 = 65536,
+	MODE_MOUSEX10   = 131072,
 	MODE_MOUSEMANY   = 262144,
 	MODE_BRCKTPASTE  = 524288,
-	MODE_MOUSE       = MODE_MOUSEBTN|MODE_MOUSEMOTION|MODE_MOUSEX10\
-	                  |MODE_MOUSEMANY,
+	MODE_MOUSE	 = MODE_MOUSEBTN|MODE_MOUSEMOTION|MODE_MOUSEX10\
+					  |MODE_MOUSEMANY,
 };
 
 enum charset {
@@ -150,12 +150,12 @@ enum charset {
 };
 
 enum escape_state {
-	ESC_START      = 1,
-	ESC_CSI        = 2,
-	ESC_STR        = 4,  /* DSC, OSC, PM, APC */
+	ESC_START	 = 1,
+	ESC_CSI	 = 2,
+	ESC_STR	 = 4,  /* DSC, OSC, PM, APC */
 	ESC_ALTCHARSET = 8,
-	ESC_STR_END    = 16, /* a final string was encountered */
-	ESC_TEST       = 32, /* Enter in test mode */
+	ESC_STR_END = 16, /* a final string was encountered */
+	ESC_TEST	   = 32, /* Enter in test mode */
 };
 
 enum window_state {
@@ -181,9 +181,9 @@ typedef unsigned short ushort;
 
 typedef struct {
 	char c[UTF_SIZ]; /* character code */
-	ushort mode;      /* attribute flags */
-	uint32_t fg;      /* foreground  */
-	uint32_t bg;      /* background  */
+	ushort mode;	  /* attribute flags */
+	uint32_t fg;	  /* foreground  */
+	uint32_t bg;	  /* background  */
 } Glyph;
 
 typedef Glyph *Line;
@@ -199,21 +199,21 @@ typedef struct {
 /* ESC '[' [[ [<priv>] <arg> [;]] <mode>] */
 typedef struct {
 	char buf[ESC_BUF_SIZ]; /* raw string */
-	int len;               /* raw string length */
+	int len;			   /* raw string length */
 	char priv;
 	int arg[ESC_ARG_SIZ];
-	int narg;              /* nb of args */
+	int narg;			 /* nb of args */
 	char mode;
 } CSIEscape;
 
 /* STR Escape sequence structs */
 /* ESC type [[ [<priv>] <arg> [;]] <mode>] ESC '\' */
 typedef struct {
-	char type;             /* ESC type ... */
+	char type;		   /* ESC type ... */
 	char buf[STR_BUF_SIZ]; /* raw string */
-	int len;               /* raw string length */
+	int len;			   /* raw string length */
 	char *args[STR_ARG_SIZ];
-	int narg;              /* nb of args */
+	int narg;			 /* nb of args */
 } STREscape;
 
 typedef struct Lines_l {
@@ -224,20 +224,20 @@ typedef struct Lines_l {
 
 /* Internal representation of the screen */
 typedef struct {
-	int row;      /* nb row */
-	int col;      /* nb col */
+	int row;	  /* nb row */
+	int col;	  /* nb col */
 	Line *line;   /* screen */
 	int *linelen;   /* screen line lenghts */
-	Line *alt;    /* alternate screen */
+	Line *alt;  /* alternate screen */
 	int * altlen;   /* alt screen line lenghts */
 	Lines *oldlines;/* scrollback list */
 	Lines *newlines;/* excess lines when scrolled back */
 	bool *dirty;  /* dirtyness of lines */
-	TCursor c;    /* cursor */
-	int top;      /* top    scroll limit */
-	int bot;      /* bottom scroll limit */
-	int mode;     /* terminal mode flags */
-	int esc;      /* escape state flags */
+	TCursor c;  /* cursor */
+	int top;	  /* top	scroll limit */
+	int bot;	  /* bottom scroll limit */
+	int mode;	/* terminal mode flags */
+	int esc;	  /* escape state flags */
 	char trantbl[4]; /* charset table translation */
 	int charset;  /* current charset */
 	int icharset; /* selected charset for sequence */
@@ -268,10 +268,10 @@ typedef struct {
 } XWindow;
 
 typedef struct {
-    int xi_opcode;
-    bool dragging;
-    bool is_touch;
-    int sx, sy;
+	int xi_opcode;
+	bool dragging;
+	bool is_touch;
+	int sx, sy;
 } Touch;
 
 typedef struct {
@@ -285,9 +285,9 @@ typedef struct {
 	uint mask;
 	char *s;
 	/* three valued logic variables: 0 indifferent, 1 on, -1 off */
-	signed char appkey;    /* application keypad */
+	signed char appkey; /* application keypad */
 	signed char appcursor; /* application cursor */
-	signed char crlf;      /* crlf mode          */
+	signed char crlf;	 /* crlf mode		*/
 } Key;
 
 typedef struct {
@@ -648,13 +648,13 @@ isfullutf8(char *s, int b) {
 	} else if((*c1 & 0xE0) == 0xC0 && b == 1) {
 		return 0;
 	} else if((*c1 & 0xF0) == 0xE0 &&
-	    ((b == 1) ||
-	    ((b == 2) && (*c2 & 0xC0) == 0x80))) {
+		((b == 1) ||
+		((b == 2) && (*c2 & 0xC0) == 0x80))) {
 		return 0;
 	} else if((*c1 & 0xF8) == 0xF0 &&
-	    ((b == 1) ||
-	    ((b == 2) && (*c2 & 0xC0) == 0x80) ||
-	    ((b == 3) && (*c2 & 0xC0) == 0x80 && (*c3 & 0xC0) == 0x80))) {
+		((b == 1) ||
+		((b == 2) && (*c2 & 0xC0) == 0x80) ||
+		((b == 3) && (*c2 & 0xC0) == 0x80 && (*c3 & 0xC0) == 0x80))) {
 		return 0;
 	} else {
 		return 1;
@@ -846,8 +846,8 @@ getbuttoninfo(XEvent *e) {
 void
 mousereport(XEvent *e) {
 	int x = x2col(e->xbutton.x), y = y2row(e->xbutton.y),
-	    button = e->xbutton.button, state = e->xbutton.state,
-	    len;
+		button = e->xbutton.button, state = e->xbutton.state,
+		len;
 	char buf[40];
 	static int ox, oy;
 
@@ -886,7 +886,7 @@ mousereport(XEvent *e) {
 
 	if(!IS_SET(MODE_MOUSEX10)) {
 		button += (state & ShiftMask   ? 4  : 0)
-			+ (state & Mod4Mask    ? 8  : 0)
+			+ (state & Mod4Mask ? 8  : 0)
 			+ (state & ControlMask ? 16 : 0);
 	}
 
@@ -915,11 +915,11 @@ bpress(XEvent *e) {
 	}
 	
 	if(touch.is_touch) {
-        touch.dragging = True;
-        touch.sx = x2col(e->xbutton.x);
-        touch.sy = y2row(e->xbutton.y);
-        return;
-    }
+		touch.dragging = True;
+		touch.sx = x2col(e->xbutton.x);
+		touch.sy = y2row(e->xbutton.y);
+		return;
+	}
 
 	if (!IS_SET(MODE_ALTSCREEN)) {
 		if(e->xbutton.button == Button5) {
@@ -1161,9 +1161,9 @@ brelease(XEvent *e) {
 	}
 	
 	if(touch.is_touch) {
-        touch.dragging = False;
-        return;
-    }
+		touch.dragging = False;
+		return;
+	}
 
 	if(e->xbutton.button == Button2) {
 		selpaste(NULL);
@@ -1188,26 +1188,25 @@ bmotion(XEvent *e) {
 	}
 	
 	if(touch.dragging) {
-        int px, py;
-        px = x2col(e->xbutton.x);
-        py = y2row(e->xbutton.y);
-        printf("py %d, sy %d\n", py, touch.sy);
-        if(py != touch.sy) {
-            touch.is_touch = False;
-            if(py > touch.sy) {
-                e->xbutton.button = Button4;
-                bpress(e);
-            } else {
-                e->xbutton.button = Button5;
-                bpress(e);
-            }
-            touch.is_touch = True;
-            touch.sx = px;
-            touch.sy = py;
-         }
-         return;
-    }
-         
+		int px, py;
+		px = x2col(e->xbutton.x);
+		py = y2row(e->xbutton.y);
+		if(py != touch.sy) {
+			touch.is_touch = False;
+			if(py > touch.sy) {
+				e->xbutton.button = Button4;
+				bpress(e);
+			} else {
+				e->xbutton.button = Button5;
+				bpress(e);
+			}
+			touch.is_touch = True;
+			touch.sx = px;
+			touch.sy = py;
+		 }
+		 return;
+	}
+		 
 
 	if(!sel.mode)
 		return;
@@ -1849,7 +1848,7 @@ tdefcolor(int *attr, int *npar, int l) {
 	case 4: /* direct colour in CMYK space */
 	default:
 		fprintf(stderr,
-		        "erresc(38): gfx attr %d unknown\n", attr[*npar]);
+				"erresc(38): gfx attr %d unknown\n", attr[*npar]);
 	}
 
 	return idx;
@@ -1990,7 +1989,7 @@ tsetmode(bool priv, bool set, int *args, int narg) {
 			case 25: /* DECTCEM -- Text Cursor Enable Mode */
 				MODBIT(term.mode, !set, MODE_HIDE);
 				break;
-			case 9:    /* X10 mouse compatibility mode */
+			case 9: /* X10 mouse compatibility mode */
 				xsetpointermotion(0);
 				MODBIT(term.mode, 0, MODE_MOUSE);
 				MODBIT(term.mode, set, MODE_MOUSEX10);
@@ -2043,13 +2042,13 @@ tsetmode(bool priv, bool set, int *args, int narg) {
 				break;
 			/* Not implemented mouse modes. See comments there. */
 			case 1001: /* mouse highlight mode; can hang the
-				      terminal by design when implemented. */
+					  terminal by design when implemented. */
 			case 1005: /* UTF-8 mouse mode; will confuse
-				      applications not supporting UTF-8
-				      and luit. */
+					  applications not supporting UTF-8
+					  and luit. */
 			case 1015: /* urxvt mangled mouse mode; incompatible
-				      and can be mistaken for other control
-				      codes. */
+					  and can be mistaken for other control
+					  codes. */
 			default:
 				fprintf(stderr,
 					"erresc: unknown private set/reset mode %d\n",
@@ -2428,8 +2427,8 @@ tdeftran(char ascii) {
 	char c, (*bp)[2];
 	static char tbl[][2] = {
 		{'0', CS_GRAPHIC0}, {'1', CS_GRAPHIC1}, {'A', CS_UK},
-		{'B', CS_USA},      {'<', CS_MULTI},    {'K', CS_GER},
-		{'5', CS_FIN},      {'C', CS_FIN},
+		{'B', CS_USA},	{'<', CS_MULTI},  {'K', CS_GER},
+		{'5', CS_FIN},	{'C', CS_FIN},
 		{0, 0}
 	};
 
@@ -3162,28 +3161,28 @@ xinit(void) {
 		die("XCreateIC failed. Could not obtain input method.\n");
 
 	/* XInput */
-    
-    /* XInput Extension available? */
-    int event, error;
-    if (!XQueryExtension(xw.dpy, "XInputExtension", &touch.xi_opcode, &event, &error)) {
-        die("X Input extension not available.\n");
-    }
-    /* Which version of XI2? We support 2.2 */
-    int major = 2, minor = 3;
-    if (XIQueryVersion(xw.dpy, &major, &minor) == BadRequest) {
-        die("XI2 not available. Server supports %d.%d\n", major, minor);
-    }
-    XIEventMask eventmask;
-    unsigned char mask[1] = { 0 }; /* the actual mask */
-    eventmask.deviceid = XIAllMasterDevices;
-    eventmask.mask_len = sizeof(mask); /* always in bytes */
-    eventmask.mask = mask;
-    /* now set the mask */
-    XISetMask(mask, XI_DeviceChanged);
-    /* select on the window */
-    XISelectEvents(xw.dpy, xw.win, &eventmask, 1);
-    
-    /* white cursor, black outline */
+	
+	/* XInput Extension available? */
+	int event, error;
+	if (!XQueryExtension(xw.dpy, "XInputExtension", &touch.xi_opcode, &event, &error)) {
+		die("X Input extension not available.\n");
+	}
+	/* Which version of XI2? We support 2.2 */
+	int major = 2, minor = 3;
+	if (XIQueryVersion(xw.dpy, &major, &minor) == BadRequest) {
+		die("XI2 not available. Server supports %d.%d\n", major, minor);
+	}
+	XIEventMask eventmask;
+	unsigned char mask[1] = { 0 }; /* the actual mask */
+	eventmask.deviceid = XIAllMasterDevices;
+	eventmask.mask_len = sizeof(mask); /* always in bytes */
+	eventmask.mask = mask;
+	/* now set the mask */
+	XISetMask(mask, XI_DeviceChanged);
+	/* select on the window */
+	XISelectEvents(xw.dpy, xw.win, &eventmask, 1);
+	
+	/* white cursor, black outline */
 	cursor = XCreateFontCursor(xw.dpy, XC_xterm);
 	XDefineCursor(xw.dpy, xw.win, cursor);
 	XRecolorCursor(xw.dpy, cursor,
@@ -3208,7 +3207,7 @@ xinit(void) {
 void
 xdraws(char *s, Glyph base, int x, int y, int charlen, int bytelen) {
 	int winx = borderpx + x * xw.cw, winy = borderpx + y * xw.ch,
-	    width = charlen * xw.cw, xp, i;
+		width = charlen * xw.cw, xp, i;
 	int frcflags;
 	int u8fl, u8fblen, u8cblen, doesexist;
 	char *u8c, *u8fs;
@@ -3274,9 +3273,9 @@ xdraws(char *s, Glyph base, int x, int y, int charlen, int bytelen) {
 		}
 		/*
 		 * Those ranges will not be brightened:
-		 *    8 - 15 – bright system colors
-		 *    196 - 231 – highest 256 color cube
-		 *    252 - 255 – brightest colors in greyscale
+		 *  8 - 15 – bright system colors
+		 *  196 - 231 – highest 256 color cube
+		 *  252 - 255 – brightest colors in greyscale
 		 */
 		font = &dc.bfont;
 		frcflags = FRC_BOLD;
@@ -3891,23 +3890,20 @@ run(void) {
 				XNextEvent(xw.dpy, &ev);
 				if(XFilterEvent(&ev, None))
 					continue;
-                if (ev.xcookie.type == GenericEvent &&
-                    ev.xcookie.extension == touch.xi_opcode &&
-                    XGetEventData(xw.dpy, &ev.xcookie)) {
-                    XIDeviceChangedEvent *dcev = (XIDeviceChangedEvent*) ev.xcookie.data;
-                    printf("Source %d\n", dcev->sourceid);
-                    /* Hack -- no idea how gtk does this right */
-                    if (dcev->num_classes > 5) {
-                        printf("Its touch!\n");
-                        touch.is_touch = True;
-                    } else {
-                        printf("Its not touch...\n");
-                        touch.is_touch = False;
-                    }
-                    touch.dragging = False;
-                    continue;
-                }
-                XFreeEventData(xw.dpy, &ev.xcookie);
+				if (ev.xcookie.type == GenericEvent &&
+					ev.xcookie.extension == touch.xi_opcode &&
+					XGetEventData(xw.dpy, &ev.xcookie)) {
+					XIDeviceChangedEvent *dcev = (XIDeviceChangedEvent*) ev.xcookie.data;
+					/* Hack -- no idea how gtk does this right */
+					if (dcev->num_classes > 5) {
+						touch.is_touch = True;
+					} else {
+						touch.is_touch = False;
+					}
+					touch.dragging = False;
+					continue;
+				}
+				XFreeEventData(xw.dpy, &ev.xcookie);
 				if(handler[ev.type])
 					(handler[ev.type])(&ev);
 			}
