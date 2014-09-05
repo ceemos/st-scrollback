@@ -250,7 +250,6 @@ typedef struct {
 	Display *dpy;
 	Colourmap cmap;
 	Window win;
-    int xi_opcode;
 	Drawable buf;
 	Atom xembed, wmdeletewin, netwmname, netwmpid;
 	XIM xim;
@@ -267,6 +266,13 @@ typedef struct {
 	int cw; /* char width  */
 	char state; /* focus, redraw, visible */
 } XWindow;
+
+typedef struct {
+    int xi_opcode;
+    bool dragging;
+    bool is_touch;
+    int sx, sy;
+} Touch;
 
 typedef struct {
 	uint b;
@@ -484,6 +490,7 @@ static STREscape strescseq;
 static int cmdfd;
 static pid_t pid;
 static Selection sel;
+static Touch touch;
 static int iofd = -1;
 static char **opt_cmd = NULL;
 static char *opt_io = NULL;
@@ -906,16 +913,23 @@ bpress(XEvent *e) {
 	if(IS_SET(MODE_MOUSE)) {
 		mousereport(e);
 	}
+	
+	if(touch.is_touch) {
+        touch.dragging = True;
+        touch.sx = x2col(e->xbutton.x);
+        touch.sy = y2row(e->xbutton.y);
+        return;
+    }
 
 	if (!IS_SET(MODE_ALTSCREEN)) {
 		if(e->xbutton.button == Button5) {
 			if (term.newlines != NULL)
-				tscrollup(0, 3);
+				tscrollup(0, 1);
 			return;
 		}
 		if(e->xbutton.button == Button4) {
 			if (term.oldlines != NULL)
-				tscrolldown(0, 3, true);
+				tscrolldown(0, 1, true);
 			return;
 		}
 	}
@@ -1145,6 +1159,11 @@ brelease(XEvent *e) {
 	if(IS_SET(MODE_MOUSE)) {
 		mousereport(e);
 	}
+	
+	if(touch.is_touch) {
+        touch.dragging = False;
+        return;
+    }
 
 	if(e->xbutton.button == Button2) {
 		selpaste(NULL);
@@ -1167,6 +1186,28 @@ bmotion(XEvent *e) {
 	if(IS_SET(MODE_MOUSE)) {
 		mousereport(e);
 	}
+	
+	if(touch.dragging) {
+        int px, py;
+        px = x2col(e->xbutton.x);
+        py = y2row(e->xbutton.y);
+        printf("py %d, sy %d\n", py, touch.sy);
+        if(py != touch.sy) {
+            touch.is_touch = False;
+            if(py > touch.sy) {
+                e->xbutton.button = Button4;
+                bpress(e);
+            } else {
+                e->xbutton.button = Button5;
+                bpress(e);
+            }
+            touch.is_touch = True;
+            touch.sx = px;
+            touch.sy = py;
+         }
+         return;
+    }
+         
 
 	if(!sel.mode)
 		return;
@@ -3124,11 +3165,11 @@ xinit(void) {
     
     /* XInput Extension available? */
     int event, error;
-    if (!XQueryExtension(xw.dpy, "XInputExtension", &xw.xi_opcode, &event, &error)) {
+    if (!XQueryExtension(xw.dpy, "XInputExtension", &touch.xi_opcode, &event, &error)) {
         die("X Input extension not available.\n");
     }
     /* Which version of XI2? We support 2.2 */
-    int major = 2, minor = 2;
+    int major = 2, minor = 3;
     if (XIQueryVersion(xw.dpy, &major, &minor) == BadRequest) {
         die("XI2 not available. Server supports %d.%d\n", major, minor);
     }
@@ -3851,22 +3892,19 @@ run(void) {
 				if(XFilterEvent(&ev, None))
 					continue;
                 if (ev.xcookie.type == GenericEvent &&
-                    ev.xcookie.extension == xw.xi_opcode &&
+                    ev.xcookie.extension == touch.xi_opcode &&
                     XGetEventData(xw.dpy, &ev.xcookie)) {
                     XIDeviceChangedEvent *dcev = (XIDeviceChangedEvent*) ev.xcookie.data;
-                    bool touch = False;
                     printf("Source %d\n", dcev->sourceid);
-                    for (int i = 0; i < dcev->num_classes; i++) {
-                        printf("Class %d\n", dcev->classes[i]->type);
-                        if (dcev->classes[i]->type == XITouchClass) {
-                            printf("Its touch!\n");
-                            touch = True;
-                            break;
-                        }
-                    }
-                    if (!touch) {
+                    /* Hack -- no idea how gtk does this right */
+                    if (dcev->num_classes > 5) {
+                        printf("Its touch!\n");
+                        touch.is_touch = True;
+                    } else {
                         printf("Its not touch...\n");
+                        touch.is_touch = False;
                     }
+                    touch.dragging = False;
                     continue;
                 }
                 XFreeEventData(xw.dpy, &ev.xcookie);
