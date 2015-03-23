@@ -1191,18 +1191,19 @@ bmotion(XEvent *e) {
 		int px, py;
 		px = x2col(e->xbutton.x);
 		py = y2row(e->xbutton.y);
-		if(py != touch.sy) {
+		while(py != touch.sy) {
 			touch.is_touch = False;
 			if(py > touch.sy) {
 				e->xbutton.button = Button4;
 				bpress(e);
+				touch.sy++;
 			} else {
 				e->xbutton.button = Button5;
 				bpress(e);
+				touch.sy--;
 			}
 			touch.is_touch = True;
 			touch.sx = px;
-			touch.sy = py;
 		 }
 		 return;
 	}
@@ -3895,7 +3896,8 @@ run(void) {
 					XGetEventData(xw.dpy, &ev.xcookie)) {
 					XIDeviceChangedEvent *dcev = (XIDeviceChangedEvent*) ev.xcookie.data;
 					/* Hack -- no idea how gtk does this right */
-					if (dcev->num_classes > 5) {
+					printf("Classes: %d\n", dcev->num_classes);
+					if (dcev->num_classes > 7) {
 						touch.is_touch = True;
 					} else {
 						touch.is_touch = False;
